@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E222E">
+<title>AuditBuddy — Know what a Jira change touches before you make it</title>
+<meta name="description" content="AuditBuddy reads your Jira Cloud configuration into one inventory, shows what a change could affect, and flags custom fields, automations and permissions worth a review.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..800&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Primary">
+    <a href="#top" class="nav-logo" aria-label="AuditBuddy home"><img src="assets/auditbuddy.png" alt="AuditBuddy" width="179" height="29"></a>
+    <div class="nav-links">
+      <a href="#auditors">Auditors</a>
+      <a href="#how">How it works</a>
+      <a href="#security">Security</a>
+      <a href="#plans">Plans</a>
+    </div>
+    <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="nav-cta">Open AuditBuddy</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<section class="hero" aria-labelledby="hero-h">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-h" class="hero-title">Know what a change touches <span>before you make it.</span></h1>
+        <div class="hero-body">
+          <p class="lead">AuditBuddy reads your Jira Cloud configuration into one inventory, shows what a change to a field, rule, status or workflow could affect, and flags the fields, automations and permissions worth a review.</p>
+          <div class="hero-actions">
+            <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Start your audit</a>
+            <a href="#auditors" class="btn btn-ghost">See what it checks</a>
+          </div>
+          <div class="hero-facts">
+            <span>Read-only inventory</span>
+            <span class="sep" aria-hidden="true">·</span>
+            <span>16 configuration categories</span>
+            <span class="sep" aria-hidden="true">·</span>
+            <span>Free plan available</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow" role="img" aria-label="AuditBuddy loading configuration from a Jira Cloud instance">
+        <div class="flow-glow" aria-hidden="true"></div>
+        <div class="flow-source">
+          <span class="flow-icon"><span></span></span>
+          <div class="flow-source-text">
+            <div class="flow-kicker">Jira Cloud</div>
+            <div class="flow-host">your-site.atlassian.net</div>
+          </div>
+          <span class="flow-status"><span class="dot pulse"></span>Connected</span>
+        </div>
+        <div class="flow-line" aria-hidden="true"></div>
+        <div class="flow-panel">
+          <div id="flow-rows"></div>
+          <div class="flow-footer">
+            <span class="flow-summary" id="flow-summary">0 of 5 fetched</span>
+            <span class="flow-export" id="flow-export">Inventory ready</span>
+          </div>
+        </div>
+        <div class="flow-line is-coral" aria-hidden="true"></div>
+        <div class="ai-chip">
+          <div class="ai-chip-ring" aria-hidden="true"></div>
+          <div class="ai-chip-inner">
+            <svg class="spark" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"><path d="M12 0C12.9 6.6 17.4 11.1 24 12C17.4 12.9 12.9 17.4 12 24C11.1 17.4 6.6 12.9 0 12C6.6 11.1 11.1 6.6 12 0Z" fill="#FC5E51"/></svg>
+            <span>Ask questions about an analysis in plain language.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mock-wrap">
+      <div class="mock-glow" aria-hidden="true"></div>
+      <div class="mock" role="img" aria-label="Illustrative AuditBuddy dashboard showing configuration categories, a data table and the AI assistant">
+        <div class="mock-top">
+          <img src="assets/auditbuddy.png" alt="">
+          <div class="spacer"></div>
+          <div class="mock-host"><span class="dot pulse"></span><span>your-site.atlassian.net</span></div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-side">
+            <div class="mock-side-head">
+              <span class="mock-label">Categories</span>
+              <button type="button" class="fetch-btn" id="fetch-all">Fetch all</button>
+            </div>
+            <div id="cat-list" style="display:contents"></div>
+          </div>
+          <div class="mock-main">
+            <div class="mock-main-head">
+              <div>
+                <div class="mock-title" id="mock-title">Projects</div>
+                <div class="mock-meta" id="mock-meta">Waiting to fetch</div>
+              </div>
+              <span class="mock-export">Export CSV <span class="tag tag-on-blue">Premium</span></span>
+            </div>
+            <div class="table is-dim" id="mock-table">
+              <div class="trow thead" id="mock-thead"></div>
+              <div class="loader"><div></div></div>
+              <div id="mock-rows"></div>
+            </div>
+          </div>
+          <div class="mock-ai">
+            <div class="mock-label"><svg class="spark" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path d="M12 0C12.9 6.6 17.4 11.1 24 12C17.4 12.9 12.9 17.4 12 24C11.1 17.4 6.6 12.9 0 12C6.6 11.1 11.1 6.6 12 0Z" fill="#FC5E51"/></svg>AI assistant</div>
+            <div class="bubble bubble-user">Show in-progress tickets in LAB</div>
+            <div class="bubble bubble-ai">Found <strong>4 issues</strong> in progress in LAB. The list is below, with a link to each one in Jira.</div>
+            <div class="grow"></div>
+            <div class="mock-input">Ask about this analysis…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="mock-note">Illustrative interface with sample data. Click a category to explore.</p>
+  </div>
+</section>
+
+<section class="problem" aria-labelledby="problem-h">
+  <div class="container">
+    <div class="eyebrow">The problem</div>
+    <div class="problem-body">
+      <h2 id="problem-h" class="lit-text" aria-label="Jira configuration builds up quietly. Projects, schemes, workflows and fields, layered over years and spread across admin screens made for editing, not auditing.">Jira configuration builds up quietly. Projects, schemes, workflows and fields, layered over years and spread across admin screens made for editing, not auditing.</h2>
+      <p>So the hard questions stay hard. Which fields are still used? Which automations point at something that's gone? Who can delete issues in a sensitive project? What breaks if this status is renamed? AuditBuddy puts those answers in one place, for an admin to review before anything changes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="extracts" class="extracts alt" aria-labelledby="ext-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="ext-h" class="h2-xl">Sixteen categories. One inventory.</h2>
+      <p>Fetch All loads every category into summary tiles and per-category tables. It's a read-only view of the instance, limited to what the connected account can read, and it's the data every auditor builds on.</p>
+    </div>
+    <ul class="extract-list" data-reveal>
+      <li><span class="extract-n">01</span><span class="extract-name">Projects &amp; issue types</span><span class="extract-note">Every project and issue type</span></li>
+      <li><span class="extract-n">02</span><span class="extract-name">Workflows &amp; schemes</span><span class="extract-note">Workflows and their schemes</span></li>
+      <li><span class="extract-n">03</span><span class="extract-name">Custom fields</span><span class="extract-note">Every custom field in the instance</span></li>
+      <li><span class="extract-n">04</span><span class="extract-name">Automations</span><span class="extract-note">Rules across every project</span></li>
+      <li><span class="extract-n">05</span><span class="extract-name">Users &amp; access schemes</span><span class="extract-note">Users, permission, notification and security schemes</span></li>
+      <li><span class="extract-n">06</span><span class="extract-name">Connected apps</span><span class="extract-note">and more, sixteen in all</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="auditors" class="modules" aria-labelledby="mod-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="mod-h" class="h2-xl">Four auditors on top of the inventory.</h2>
+      <p>Each one answers a question admins ask before a change, a cleanup or an access review, and leaves every result for a person to decide on.</p>
+    </div>
+
+    <article class="module" data-reveal aria-labelledby="m1-h">
+      <div class="module-copy">
+        <div class="eyebrow">01 · Impact Analyzer</div>
+        <h3 id="m1-h">What could break if I change or delete this?</h3>
+        <p>Pick a custom field, automation rule, status, workflow or project. AuditBuddy builds a tree of the related items it finds in your loaded data, and an AI model rates each one Critical, High, Medium or Low with its reasoning and a recommendation. You get a structured first look before you make the change in Jira.</p>
+        <ul class="subs">
+          <li><strong>Affected groups and users</strong><span>The groups with access to the affected projects, their member counts and an estimated number of users, so you know who to tell.</span></li>
+          <li><strong>Batch analysis <span class="tag">Premium</span></strong><span>Review up to 10 elements of any type in one tree, for larger restructures.</span></li>
+          <li><strong>AI assistant chat</strong><span>Ask about the analysis in plain language, list matching issues or start a new analysis. Suggested questions on Free; free-form questions on Premium.</span></li>
+        </ul>
+        <p class="limit"><span>Good to know</span>Risk levels are AI judgments and can vary between runs. An empty tree is not proof of no impact.</p>
+      </div>
+      <div class="card viz" role="img" aria-label="Illustrative impact tree for retiring the Legacy Region custom field">
+        <div class="viz-head"><span>Impact analysis</span><span class="viz-note">Illustrative</span></div>
+        <div class="tree">
+          <div class="node node-root"><span class="node-type">Custom field</span><span class="node-name">Legacy Region</span><span class="node-meta">3 affected items</span></div>
+          <div class="tree-children">
+            <div class="node"><span class="node-type">Automation rule</span><span class="node-name">Copy region to linked issues</span><span class="risk risk-high">High</span></div>
+            <div class="node"><span class="node-type">Automation rule</span><span class="node-name">Route by region on create</span><span class="risk risk-high">High</span></div>
+            <div class="node"><span class="node-type">Field context</span><span class="node-name">Global context</span><span class="risk risk-med">Medium</span></div>
+          </div>
+        </div>
+        <div class="viz-ai"><svg class="spark" aria-hidden="true" width="13" height="13" viewBox="0 0 24 24"><path d="M12 0C12.9 6.6 17.4 11.1 24 12C17.4 12.9 12.9 17.4 12 24C11.1 17.4 6.6 12.9 0 12C6.6 11.1 11.1 6.6 12 0Z" fill="#FC5E51"/></svg><span>Both rules write to this field. Update or disable them in Jira before retiring it.</span></div>
+      </div>
+    </article>
+
+    <article class="module module-flip" data-reveal aria-labelledby="m2-h">
+      <div class="module-copy">
+        <div class="eyebrow">02 · Field Auditor</div>
+        <h3 id="m2-h">Which of our custom fields are actually used?</h3>
+        <p>Every field with its type, scope, screens, issues with data and last use. A cleanup filter narrows it to fields with no data that sit on no scanned screen. Instead of six hundred fields, you get a short list to review, with the screens and projects each one touches.</p>
+        <ul class="subs">
+          <li><strong>Project footprint</strong><span>Coverage for every field holding data in a project: high (80%+), medium (40–79%) or low (under 40%). A factual starting point for scoping a migration.</span></li>
+          <li><strong>AI JQL generator <span class="tag">Premium</span></strong><span>Turn a plain-language question into JQL with an explanation, then copy it into Jira's issue search.</span></li>
+        </ul>
+        <p class="limit"><span>Good to know</span>"Unused" means worth reviewing, not safe to delete. Free scans one project; Premium scans the whole instance.</p>
+      </div>
+      <div class="card viz" role="img" aria-label="Illustrative field health results for project OPS">
+        <div class="viz-head"><span>Field health · Project OPS</span><span class="viz-note">Illustrative</span></div>
+        <div class="tiles">
+          <div class="tile"><span class="tile-n">96</span><span class="tile-l">Unused fields</span></div>
+          <div class="tile tile-accent"><span class="tile-n">18</span><span class="tile-l">Cleanup candidates</span></div>
+        </div>
+        <div class="vlist">
+          <div class="vrow"><span class="vrow-name">Legacy Region</span><span class="vrow-meta">No data · 0 screens</span><span class="flag">Review</span></div>
+          <div class="vrow"><span class="vrow-name">Old Severity</span><span class="vrow-meta">No data · 0 screens</span><span class="flag">Review</span></div>
+          <div class="vrow"><span class="vrow-name">Vendor Code</span><span class="vrow-meta">No data · 0 screens</span><span class="flag">Review</span></div>
+        </div>
+        <div class="footprint">
+          <div class="footprint-head"><span>Footprint · Project SHIP</span><span>45 fields with data</span></div>
+          <div class="footprint-bar" aria-hidden="true"><span style="flex:22;background:#0474EF"></span><span style="flex:9;background:#69AAFF"></span><span style="flex:14;background:rgba(241,241,241,.22)"></span></div>
+          <div class="footprint-legend"><span><i style="background:#0474EF"></i>22 high</span><span><i style="background:#69AAFF"></i>9 medium</span><span><i style="background:rgba(241,241,241,.22)"></i>14 low</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="module" data-reveal aria-labelledby="m3-h">
+      <div class="module-copy">
+        <div class="eyebrow">03 · Automation Rules Auditor</div>
+        <h3 id="m3-h">Which automations point at things that no longer exist?</h3>
+        <p>Every rule in one searchable list, including disabled rules and rules that touch fields. The Dead Reference Detector compares what rules reference with the fields, statuses and projects you've loaded, and points you to the rules that may fail after something was changed or removed.</p>
+        <ul class="subs">
+          <li><strong>Impact search</strong><span>Search a field ID, status name or project key to see every loaded rule that references it, before you rename or archive it.</span></li>
+          <li><strong>Multi-entity report and Explain with AI <span class="tag">Premium</span></strong><span>Pick several fields, statuses and projects at once and see which rules tie two or more of them together, with an AI summary grouped by finding.</span></li>
+        </ul>
+        <p class="limit"><span>Good to know</span>A match is a candidate for review, not proof of failure. Free shows how many rules are affected; Premium lists each one with what's missing and an Edit in Jira link.</p>
+      </div>
+      <div class="card viz" role="img" aria-label="Illustrative dead reference results and an impact search">
+        <div class="viz-head"><span>Dead references · 7 rules flagged</span><span class="viz-note">Illustrative</span></div>
+        <div class="vlist">
+          <div class="vrow vrow-stack"><span class="vrow-name">Set region on create</span><span class="vrow-meta"><code>customfield_10231</code> · field not found</span><span class="vrow-btn">Edit in Jira</span></div>
+          <div class="vrow vrow-stack"><span class="vrow-name">Notify QA on transition</span><span class="vrow-meta">Status “Awaiting QA” · not found</span><span class="vrow-btn">Edit in Jira</span></div>
+          <div class="vrow vrow-stack"><span class="vrow-name">Weekly cleanup</span><span class="vrow-meta">Project OLD · not found</span><span class="vrow-btn">Edit in Jira</span></div>
+        </div>
+        <div class="search">
+          <div class="search-box"><span class="search-label">Impact search</span><span>In Review</span></div>
+          <div class="search-result"><strong>12 rules</strong> reference this status</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="module module-flip" data-reveal aria-labelledby="m4-h">
+      <div class="module-copy">
+        <div class="eyebrow">04 · Access Auditor</div>
+        <h3 id="m4-h">See who can do what, across every project.</h3>
+        <p>Trace access through groups, users and projects, with permissions marked HIGH, MED or SAFE. Large groups that hold high-risk permissions like Delete Issues or Administer Projects stand out, so access reviews, role changes and offboarding start from a clear picture.</p>
+        <ul class="subs">
+          <li><strong>Group access</strong><span>One group's members and every project it reaches, with roles and permissions. Compare two look-alike groups side by side.</span></li>
+          <li><strong>User access</strong><span>Trace one person's access through direct grants, groups and roles, or check a new hire against a colleague.</span></li>
+          <li><strong>Project access</strong><span>Every role, group, user and permission for one project, for owners and auditors of sensitive work.</span></li>
+        </ul>
+        <p class="limit"><span>Good to know</span>Covers groups, roles and permission schemes; not global permissions, issue security or application access. HIGH means review. Needs Administer Projects.</p>
+      </div>
+      <div class="card viz" role="img" aria-label="Illustrative group access audit for contractors-all">
+        <div class="viz-head"><span>Group access</span><span class="viz-note">Illustrative</span></div>
+        <div class="group">
+          <div><div class="group-name">contractors-all</div><div class="group-meta">84 members · reaches 5 projects</div></div>
+          <span class="flag flag-coral">Large</span>
+        </div>
+        <div class="vlist">
+          <div class="vrow"><span class="vrow-name">Delete Issues</span><span class="vrow-meta">5 projects</span><span class="lvl lvl-high">HIGH</span></div>
+          <div class="vrow"><span class="vrow-name">Move Issues</span><span class="vrow-meta">5 projects</span><span class="lvl lvl-med">MED</span></div>
+          <div class="vrow"><span class="vrow-name">Browse Projects</span><span class="vrow-meta">5 projects</span><span class="lvl">SAFE</span></div>
+        </div>
+        <div class="compare"><span>Compare with</span><span class="compare-chip">contractors-emea</span></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="principles alt" aria-labelledby="pr-h">
+  <div class="container">
+    <div class="head" data-reveal>
+      <div class="eyebrow">How it reports</div>
+      <h2 id="pr-h" class="h2-xl">Built to flag, not to decide.</h2>
+    </div>
+    <div class="principle-grid" data-reveal>
+      <div class="principle"><span class="step-n">01</span><h3>Candidates, not verdicts</h3><p>Unused fields, dead references and high-risk permissions are flagged for an admin to review. Nothing is labelled safe to delete.</p></div>
+      <div class="principle"><span class="step-n">02</span><h3>Only what's loaded</h3><p>Analysis covers the data you've loaded and what the connected account can read. An empty result is not proof of no impact.</p></div>
+      <div class="principle"><span class="step-n">03</span><h3>AI is labelled as AI</h3><p>Risk levels, JQL and summaries come from an AI model and can be wrong. Check them in Jira. AI features need your data consent.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="how" aria-labelledby="how-h">
+  <div class="container">
+    <div class="head" data-reveal>
+      <div class="eyebrow">How it works</div>
+      <h2 id="how-h" class="h2-xl">Three steps. No setup.</h2>
+    </div>
+    <ol class="steps" data-reveal>
+      <li class="step">
+        <span class="step-n">01</span>
+        <h3>Connect your instance</h3>
+        <p>Enter your Jira URL, email and API token. Credentials are used only for this session.</p>
+        <div class="fields">
+          <div class="field"><span>Jira URL</span><span>your-site.atlassian.net</span></div>
+          <div class="field"><span>Email</span><span>you@company.com</span></div>
+          <div class="field is-focus"><span>API token</span><span class="mask">••••••••••</span></div>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-n">02</span>
+        <h3>Load the inventory</h3>
+        <p>Fetch All loads 16 configuration categories, or load one category at a time.</p>
+        <div class="chips">
+          <span class="chip is-primary">Fetch all</span>
+          <span class="chip">Projects</span>
+          <span class="chip">Workflows</span>
+          <span class="chip">Automations</span>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-n">03</span>
+        <h3>Review with the auditors</h3>
+        <p>Check fields, automations, access and the impact of a change. On Premium, export to CSV and PDF.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="guide" class="guide alt" aria-labelledby="guide-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <div>
+        <div class="eyebrow gs-eyebrow">Getting started guide</div>
+        <h2 id="guide-h" class="h2-xl">Your first audit, step by step.</h2>
+      </div>
+      <p>From creating your account to opening your first audit tool. Five steps, on the screens you'll see.</p>
+    </div>
+
+    <div class="gs-grid" data-reveal>
+      <ol class="gs-list" id="gs-list">
+        <li class="gs-item is-active">
+          <span class="gs-bar" aria-hidden="true"></span>
+          <button type="button" class="gs-btn" aria-controls="gs-shot-1" aria-current="step">
+            <span class="gs-icon"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M19 8v6M16 11h6"/></svg></span><span class="gs-title">Create your account</span><span class="gs-n">01</span>
+          </button>
+          <div class="gs-panel"><div>
+            <ul class="gs-points">
+              <li>Go to <a href="https://audit.movonte.com" target="_blank" rel="noopener">audit.movonte.com</a>.</li>
+              <li>Click <strong>Get started</strong> in the top bar, or <strong>Create one</strong> on the Log in form.</li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="gs-item">
+          <span class="gs-bar" aria-hidden="true"></span>
+          <button type="button" class="gs-btn" aria-controls="gs-shot-2">
+            <span class="gs-icon"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="gs-title">Fill out the form</span><span class="gs-n">02</span>
+          </button>
+          <div class="gs-panel"><div>
+            <ul class="gs-points">
+              <li>Choose the plan that fits you.</li>
+              <li>Enter your name, email and company. Phone is optional.</li>
+              <li>Create a password with at least 8 characters, one uppercase letter, one lowercase letter and one symbol, or click <strong>Generate secure password</strong>.</li>
+              <li>Click <strong>Create account</strong>.</li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="gs-item">
+          <span class="gs-bar" aria-hidden="true"></span>
+          <button type="button" class="gs-btn" aria-controls="gs-shot-3">
+            <span class="gs-icon"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></span><span class="gs-title">Verify your email</span><span class="gs-n">03</span>
+          </button>
+          <div class="gs-panel"><div>
+            <ul class="gs-points">
+              <li>Open the verification link we send you to activate your account.</li>
+              <li>Once you open it, you're signed in automatically.</li>
+              <li>Didn't get it? Check your spam folder or click <strong>Resend email</strong>.</li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="gs-item">
+          <span class="gs-bar" aria-hidden="true"></span>
+          <button type="button" class="gs-btn" aria-controls="gs-shot-4">
+            <span class="gs-icon"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg></span><span class="gs-title">Connect to Jira</span><span class="gs-n">04</span>
+          </button>
+          <div class="gs-panel"><div>
+            <ul class="gs-points">
+              <li>Enter your Jira instance URL (for example, company.atlassian.net), the email of your Jira user and your API token.</li>
+              <li>No token yet? Generate one in your Atlassian Account Settings.</li>
+              <li>Credentials are used only for the current session and are never stored.</li>
+              <li>Click <strong>Connect to Jira</strong> and you're ready to audit.</li>
+            </ul>
+          </div></div>
+        </li>
+        <li class="gs-item">
+          <span class="gs-bar" aria-hidden="true"></span>
+          <button type="button" class="gs-btn" aria-controls="gs-shot-5">
+            <span class="gs-icon"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span><span class="gs-title">Open an audit tool</span><span class="gs-n">05</span>
+          </button>
+          <div class="gs-panel"><div>
+            <ul class="gs-points">
+              <li>The side panel on the left lists every tool available for the connected instance.</li>
+              <li>Pick one to start auditing.</li>
+            </ul>
+          </div></div>
+        </li>
+      </ol>
+
+      <div class="gs-stage-wrap">
+        <div class="gs-stage" id="gs-stage">
+          <figure class="gs-shot is-active" id="gs-shot-1" aria-label="Log in screen with the Get started button and the Create one link">
+            <div class="gs-frame"><div class="gs-screen ui ui-combo">
+              <div class="ui-card ui-login">
+                <div class="ui-h">Log in</div>
+                <div class="ui-sub ui-center">Welcome back — access your Jira audit workspace.</div>
+                <div class="ui-field"><span class="ui-label">Email</span><span class="ui-input">you@company.com</span></div>
+                <div class="ui-field"><span class="ui-label ui-row">Password<span class="ui-link">Forgot password?</span></span><span class="ui-input ui-input-icon">Enter your password<svg class="" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span></div>
+                <span class="ui-btn">Sign in</span>
+                <div class="ui-foot ui-center">No account yet? <span class="ui-link gs-target">Create one</span></div>
+              </div>
+              <div class="ui-card ui-topbar"><span>New to Jira Audit Hub?</span><span class="ui-btn ui-btn-sm gs-target">Get started</span></div>
+            </div></div>
+          </figure>
+          <figure class="gs-shot" id="gs-shot-2" aria-label="Create account form">
+            <div class="gs-frame"><div class="gs-screen ui ui-card ui-form">
+              <div class="ui-h ui-left">Create account</div>
+              <div class="ui-sub">Set up your Jira audit workspace in under a minute.</div>
+              <div class="ui-cols"><div class="ui-field"><span class="ui-label">First name</span><span class="ui-input">Jane</span></div><div class="ui-field"><span class="ui-label">Last name</span><span class="ui-input">Doe</span></div></div>
+              <div class="ui-cols"><div class="ui-field"><span class="ui-label">Email</span><span class="ui-input">jane@company.com</span></div><div class="ui-field"><span class="ui-label">Company</span><span class="ui-input">Acme Inc.</span></div></div>
+              <div class="ui-field"><span class="ui-label">Phone <em>(optional)</em></span><span class="ui-input ui-phone"><span class="ui-cc">+1</span>555 123 4567</span></div>
+              <div class="ui-cols">
+                <div class="ui-field"><span class="ui-label ui-row">Password<span class="ui-link ui-gen"><svg class="" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>Generate secure password</span></span><span class="ui-input ui-input-icon">Create a strong password<svg class="" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span></div>
+                <div class="ui-field"><span class="ui-label">Confirm password</span><span class="ui-input ui-input-icon">Repeat your password<svg class="" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg></span></div>
+              </div>
+              <div class="ui-reqs"><span>8+ characters</span><span>Uppercase letter</span><span>Lowercase letter</span><span>Symbol (! @ # $ …)</span><span>Passwords match</span></div>
+              <span class="ui-btn gs-target">Create account</span>
+              <div class="ui-legal">By clicking Create Account, you agree to our <u>Privacy Policy</u> and <u>Data Handling Policy</u>.</div>
+            </div></div>
+          </figure>
+          <figure class="gs-shot" id="gs-shot-3" aria-label="Check your email screen">
+            <div class="gs-frame"><div class="gs-screen ui ui-card ui-email">
+              <span class="ui-blue"><svg class="" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></span>
+              <div class="ui-h ui-left">Check your email</div>
+              <p class="ui-p">We sent a verification link to <strong>you@company.com</strong>. Open it to activate your account and start auditing.</p>
+              <p class="ui-p">You will be signed in automatically once the link is opened. If it does not arrive in a couple of minutes, check the spam folder.</p>
+              <div class="ui-actions"><span class="ui-btn-ghost gs-target">Resend email</span><span class="ui-btn-text">Use a different email</span></div>
+              <div class="ui-foot">Already verified? <span class="ui-link">Sign in</span></div>
+            </div></div>
+          </figure>
+          <figure class="gs-shot" id="gs-shot-4" aria-label="Connect to Jira form">
+            <div class="gs-frame"><div class="gs-screen ui ui-card ui-connect">
+              <div class="ui-title-row"><span class="ui-tile"><svg class="" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg></span><span class="ui-h ui-left">Connect to Jira</span></div>
+              <div class="ui-sub">Choose an authentication method to start the audit</div>
+              <div class="ui-field"><span class="ui-label">Jira Instance URL</span><span class="ui-input">your-domain.atlassian.net</span><span class="ui-hint">Your Jira Cloud URL (e.g., company.atlassian.net)</span></div>
+              <div class="ui-field"><span class="ui-label">Email Address</span><span class="ui-input">your-email@company.com</span></div>
+              <div class="ui-field"><span class="ui-label">API Token</span><span class="ui-input ui-mask">••••••••••••••••</span><span class="ui-hint"><svg class="" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>Generate at <span class="ui-link">Atlassian Account Settings</span></span></div>
+              <div class="ui-notice"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z"/></svg><span>Credentials are used only for this session and are never stored. All requests are securely processed. After connecting we will ask before sending any scan result to our AI sub-processor — the audit itself works either way.</span></div>
+              <span class="ui-btn gs-target"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg>Connect to Jira</span>
+            </div></div>
+          </figure>
+          <figure class="gs-shot" id="gs-shot-5" aria-label="Audit tools side panel">
+            <div class="gs-frame"><div class="gs-screen ui ui-card ui-tools">
+              <div class="ui-tools-head">
+                <div class="ui-title-row"><span class="ui-blue"><svg class="" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span><span class="ui-h4">Audit tools</span></div>
+                <div class="ui-sub">Jump into any audit tool for the connected instance.</div>
+              </div>
+              <div class="ui-tools-body">
+                <div class="ui-cap">Connected instance</div>
+                <div class="ui-instance"><span class="ui-green"></span><svg class="" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.5 5.7 3.5 9s-1 6.3-3.5 9c-2.5-2.7-3.5-5.7-3.5-9s1-6.3 3.5-9z"/></svg><code>your-site.atlassian.net</code></div>
+                <div class="ui-cap">Tools</div>
+                <div class="ui-toollist gs-target">
+                  <div class="ui-tool"><span class="ui-tile ui-tile-sm"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg></span><span><b>Relationship Map</b><i>Visualize project &amp; scheme dependencies</i></span></div>
+                  <div class="ui-tool"><span class="ui-tile ui-tile-sm"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></span><span><b>Field Auditor</b><i>Inspect custom-field usage and health</i></span></div>
+                  <div class="ui-tool"><span class="ui-tile ui-tile-sm"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span><span><b>Automation Auditor</b><i>Review automation rules across projects</i></span></div>
+                  <div class="ui-tool"><span class="ui-tile ui-tile-sm"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="7" r="2.2"/><path d="M6 7.2v9.6M18 9.2c0 4-5 4-10.5 8"/></svg></span><span><b>Impact Analyzer</b><i>Trace downstream effects of a change</i></span></div>
+                  <div class="ui-tool"><span class="ui-tile ui-tile-sm"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z"/></svg></span><span><b>Access Auditor Suite</b><i>Group, user &amp; project access review</i></span><svg class="ui-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
+                </div>
+              </div>
+              <div class="ui-disconnect"><svg class="" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></svg>Disconnect</div>
+            </div></div>
+          </figure>
+          <div class="gs-controls">
+            <span class="gs-count" id="gs-count" aria-live="polite">Step 1 of 5</span>
+            <div class="gs-arrows">
+              <button type="button" class="gs-nav" id="gs-prev" aria-label="Previous step">Prev</button>
+              <button type="button" class="gs-nav" id="gs-next" aria-label="Next step">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gs-end" data-reveal>
+      <p>That's it. Load the inventory and start with any auditor.</p>
+      <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="btn btn-primary btn-lg">Create your account</a>
+    </div>
+  </div>
+</section>
+
+<section id="security" class="security" aria-labelledby="sec-h">
+  <div class="security-card" data-reveal>
+    <div class="security-grid">
+      <div>
+        <div class="eyebrow">Secure connection</div>
+        <h2 id="sec-h">Your credentials are never stored.</h2>
+      </div>
+      <div class="security-list">
+        <div class="security-item"><span>01</span><span>Credentials are used only for the session you're in.</span></div>
+        <div class="security-item"><span>02</span><span>All connections are encrypted.</span></div>
+        <div class="security-item"><span>03</span><span>You authenticate with your own Jira API token.</span></div>
+        <div class="security-item"><span>04</span><span>AI features run only with your AI data consent.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="plans" class="plans" aria-labelledby="plans-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="plans-h" class="h2-xl">Start on Free. Go deeper on Premium.</h2>
+      <p>Every auditor is available on Free. Premium widens scans, adds export and unlocks the AI and batch tools.</p>
+    </div>
+    <div class="plan-grid" data-reveal>
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <ul class="plan-list">
+          <li>Full dashboard and every category table</li>
+          <li>Impact Analyzer, one element at a time, 25 analyses a day</li>
+          <li>Affected groups and estimated users</li>
+          <li>AI assistant with suggested questions, 20 a day</li>
+          <li>Field health for one project, footprint estimates</li>
+          <li>Automation rules inventory and impact search</li>
+          <li>Count of rules with dead references</li>
+          <li>Group, user and project access audits, with comparison</li>
+        </ul>
+        <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="btn btn-ghost plan-cta">Start on Free</a>
+      </div>
+      <div class="plan plan-premium">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price"><span class="plan-amount">129.99 USD</span><span class="plan-period">per month</span></div>
+        <div class="plan-sub">Everything in Free, plus</div>
+        <ul class="plan-list">
+          <li>CSV and PDF export</li>
+          <li>Impact Analyzer with no daily allowance</li>
+          <li>Batch analysis of up to 10 elements</li>
+          <li>Free-form AI assistant questions</li>
+          <li>Whole-instance field scans and full project footprint, up to 20,000 issues</li>
+          <li>AI JQL generator</li>
+          <li>Every dead reference, with Edit in Jira</li>
+          <li>Multi-entity report with Explain with AI</li>
+        </ul>
+        <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="btn btn-primary btn-lg plan-cta">Open AuditBuddy</a>
+        <p class="plan-note">*Membership prices and extra benefits may change over time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing" aria-labelledby="cta-h">
+  <div class="closing-glow" aria-hidden="true"></div>
+  <div class="closing-inner" data-reveal>
+    <h2 id="cta-h">Stop piecing Jira together <span class="accent">screen by screen.</span></h2>
+    <p class="lead">Connect your instance, load the inventory and see what a change touches before you make it.</p>
+    <a href="https://audit.movonte.com" target="_blank" rel="noopener" class="btn btn-primary btn-xl">Open AuditBuddy</a>
+    <span class="closing-url">audit.movonte.com</span>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/auditbuddy.png" alt="AuditBuddy" width="179" height="29">
+      <div class="footer-links">
+        <a href="#auditors">Auditors</a>
+        <a href="#how">How it works</a>
+        <a href="#security">Security</a>
+        <a href="#plans">Plans</a>
+        <a href="https://audit.movonte.com" target="_blank" rel="noopener">Open the app</a>
+        <a href="https://movonte.com/privacy.html" target="_blank" rel="noopener">Privacy</a>
+      </div>
+    </div>
+    <div class="attribution">
+      <span>Another product by</span>
+      <img src="assets/movonte.png" alt="Movonte" width="1800" height="458">
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
